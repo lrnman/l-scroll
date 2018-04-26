@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "l-scroll-view": "/components/l-scroll-view"
+  }
+}

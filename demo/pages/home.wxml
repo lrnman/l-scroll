@@ -1,0 +1,7 @@
+<view class="header">header</view>
+<l-scroll-view refreshing="{{refreshing}}" nomore="{{nomore}}" down-trigger="{{downTrigger}}" scroll-top="{{scrollTop}}" bindrefresh="_onPullDownRefresh" bindloadmore="_onLoadmore" bindscrolling="_onScroll" >
+  <block wx:for="{{colors}}" wx:for-index="index" wx:key="index">
+    <view class="view" style="background: {{item}}">{{index + 1}}. {{item}}</view>
+  </block>
+</l-scroll-view>
+<view class="header" catchtap="_doTap">点击触发下拉刷新</view>

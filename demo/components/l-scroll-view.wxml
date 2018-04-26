@@ -1,0 +1,90 @@
+<!-- 
+refreshing: 下拉刷新结束设置为true
+nomore:     上拉加载没有更多数据设置为true
+_onPullDownRefresh: 下拉刷新加载处理
+_onLoadmore：       上拉加载处理
+_onScroll  ：       滚动处理
+downTrigger: 程序触发下拉刷新的接口
+scrollTop  ：程序设置滚动条位置
+
+//wxtl
+<l-scroll-view refreshing="{{refreshing}}" nomore="{{nomore}}" down-trigger="{{downTrigger}}" scroll-top="{{scrollTop}}" bindrefresh="_onPullDownRefresh" bindloadmore="_onLoadmore" bindscrolling="_onScroll" >
+  <block wx:for="{{colors}}" wx:for-index="index" wx:key="index">
+    <view class="view" style="background: {{item}}">{{index + 1}}. {{item}}</view>
+  </block>
+</l-scroll-view>
+
+//wxss
+l-scroll-view {
+  height: calc(100vh - 120px);
+}
+
+//js
+Page({
+
+  data: {
+    colors: [],
+    scrollTop: 0,
+  },
+
+  _randomColor: function () {
+    return `rgba(${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${(Math.random() * 0.3 + 0.2).toFixed(1)})`;
+  },
+
+  _generateColors: function (length) {
+    return new Array(length).fill(null).map(() => this._randomColor());
+  },
+
+  //下拉刷新监听函数
+  _onPullDownRefresh: function () {
+    this._onLoadmore(() => [], () => this.setData({ refreshing: false }));
+  },
+
+  //加载更多监听函数
+  _onLoadmore: function (cb, cb2) {
+    setTimeout(() => {
+      const colors = this._generateColors(20);
+      var old = this.data.colors;
+      cb instanceof Function && cb() && (old = []);
+      this.setData({ colors: [...old, ...colors] });
+      cb2 instanceof Function && cb2();
+      if (this.data.colors.length >= 50) {
+        this.setData({ nomore: true })
+      }
+    }, 2000);
+  },
+
+  _onScroll: function (e) {
+    console.log('_onScroll');
+  },
+
+  onLoad: function (options) {
+    const colors = this._generateColors(20);
+    setTimeout(() => {
+      this.setData({
+        colors,
+        // downTrigger: true
+      })
+      setTimeout(() => this.setData({
+        scrollTop: 1
+      }), 1);
+    }, 1000);
+  },
+})
+
+ -->
+
+<scroll-view class="scroll-view {{pullDownStatus === 3 ? 'refresh' : ''}} {{pullDownStatus === 4 ? 'finish' : ''}}" scroll-y scroll-with-animation enable-back-to-top catchscroll="_onScroll" catchtouchend="_onTouchEnd" catchscrolltolower="_onLoadmore" catchanimationend="{{pullDownStatus === 4 ? '_finishAnimateHandler' : ''}}" scroll-top="{{scrollTop}}" >
+  <view class="pulldown">
+      <text class="iconfont {{pullDownStatus === 0 ? 'balabala' : pullDownStatus === 1 ? 'icon-pull-down' : pullDownStatus === 2 ? 'icon-release-up ' : pullDownStatus === 3 ? 'icon-loading loading' : pullDownStatus === 4 ? 'icon-complete' : ''}}" space="nbsp"></text><text>{{pullDownStatus === 0 || pullDownStatus === 1 ? pullText : pullDownStatus === 2 ? releaseText : pullDownStatus === 3 ? loadingText : pullDownStatus === 4 ? finishText : ''}}</text>
+  </view>
+  <slot></slot>
+  <view class="loadmore">
+    <block wx:if="{{nomore}}">
+      <text>{{nomoreText}}</text>
+    </block>
+    <block wx:else>
+      <text class="iconfont icon-loading loading" space="nbsp"></text><text> {{loadmoreText}}</text>
+    </block>
+  </view>
+</scroll-view>
